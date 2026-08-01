@@ -4,10 +4,12 @@ node_modules/
 # 前端构建产物
 web/dist/
 
-# 数据库（主库上传用于云端部署；WAL/备份文件不传）
+# 数据库（含用户/商品/订单数据，切勿提交到 Git）
+*.db
 *.db-shm
 *.db-wal
 *.bak*
+data.db*
 
 # 环境变量
 .env
