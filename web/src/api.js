@@ -21,6 +21,14 @@ async function request(path, options = {}) {
 export const api = {
   // 排行榜（realm境界/stone灵石/alchemy炼丹师）
   getRank: (type, limit = 20) => request(`/rank?type=${type}&limit=${limit}`),
+  // 管理员：备份下载（返回 blob，需手动带 token）/ 导入数据库（base64）
+  adminBackup: async () => {
+    const res = await fetch(BASE + '/admin/backup', { headers: { 'Authorization': 'Bearer ' + getToken() } })
+    if (!res.ok) return { code: res.status, msg: '备份失败' }
+    const blob = await res.blob()
+    return { code: 0, blob, filename: (res.headers.get('content-disposition') || '').match(/filename=(.+)/)?.[1] || 'backup.db' }
+  },
+  adminRestore: (fileBase64) => request('/admin/restore', { method: 'POST', body: JSON.stringify({ file: fileBase64 }) }),
   // 认证
   login: (username, password) => request('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
   // 商品

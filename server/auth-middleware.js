@@ -44,7 +44,7 @@ function requireUser(req, res, next) {
   }
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    const user = db.prepare('SELECT id, username, xuid, server_id FROM users WHERE id = ?').get(payload.uid);
+    const user = db.prepare('SELECT id, username, xuid, server_id, is_admin FROM users WHERE id = ?').get(payload.uid);
     if (!user) {
       return res.status(401).json({ code: 401, msg: '账号不存在' });
     }
@@ -55,8 +55,20 @@ function requireUser(req, res, next) {
   }
 }
 
+/**
+ * 管理员校验：先 requireUser，再检查 is_admin
+ */
+function requireAdmin(req, res, next) {
+  requireUser(req, res, () => {
+    if (!req.user.is_admin) {
+      return res.status(403).json({ code: 403, msg: '无管理员权限' });
+    }
+    next();
+  });
+}
+
 function signToken(user) {
   return jwt.sign({ uid: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRE });
 }
 
-module.exports = { requireServerKey, requireUser, signToken, JWT_SECRET };
+module.exports = { requireServerKey, requireUser, requireAdmin, signToken, JWT_SECRET };

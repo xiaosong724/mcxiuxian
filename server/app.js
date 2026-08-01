@@ -11,12 +11,13 @@ const orderRoutes = require('./routes/orders');
 const profileRoutes = require('./routes/profiles');
 const settingsRoutes = require('./routes/settings');
 const rankRoutes = require('./routes/rank');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 中间件
-app.use(express.json({ limit: '2mb' })); // 物品 NBT 数据可能较大
+app.use(express.json({ limit: '120mb' })); // 物品 NBT / 数据库导入(base64) 数据可能较大
 
 // 请求日志（排查游戏端调用问题用）
 app.use('/api', (req, res, next) => {
@@ -40,6 +41,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/rank', rankRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 生产模式：托管前端构建产物（web/dist），单端口部署
 // 本地开发仍用 Vite（5173 + 代理），此段仅在 dist 存在时生效

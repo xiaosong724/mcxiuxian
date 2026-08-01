@@ -8,6 +8,7 @@
       <RouterLink to="/mine" active-class="active">我的上架</RouterLink>
       <RouterLink to="/orders" active-class="active">交易记录</RouterLink>
       <RouterLink to="/rank" active-class="active">排行榜</RouterLink>
+      <RouterLink v-if="store.isAdmin" to="/admin" active-class="active">管理</RouterLink>
       <span class="spacer"></span>
       <template v-if="store.isLogin">
         <span class="muted">修士：{{ store.username }}</span>

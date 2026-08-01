@@ -5,6 +5,28 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('node:path');
 
 const DB_PATH = path.join(__dirname, 'data.db');
+
+// 管理员导入（restore）应用：启动时若存在 pending_restore.db，
+// 先备份当前库，再覆盖 data.db（旧库备份为 data.db.pre_restore.bak）
+const fs = require('node:fs');
+const PENDING_RESTORE = path.join(__dirname, 'pending_restore.db');
+if (fs.existsSync(PENDING_RESTORE)) {
+  try {
+    const bak = DB_PATH + '.pre_restore.bak';
+    if (fs.existsSync(bak)) fs.unlinkSync(bak);
+    if (fs.existsSync(DB_PATH)) fs.copyFileSync(DB_PATH, bak);
+    for (const f of ['data.db-wal', 'data.db-shm']) {
+      const p = path.join(__dirname, f);
+      if (fs.existsSync(p)) fs.unlinkSync(p);
+    }
+    fs.copyFileSync(PENDING_RESTORE, DB_PATH);
+    fs.unlinkSync(PENDING_RESTORE);
+    console.log('[xiuxian_ctm] 已应用数据库导入（旧库已备份为 data.db.pre_restore.bak）');
+  } catch (e) {
+    console.error('[xiuxian_ctm] 数据库导入应用失败：', e.message);
+  }
+}
+
 const db = new DatabaseSync(DB_PATH);
 
 // 开启 WAL 提升并发读写性能
@@ -27,6 +49,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   xuid TEXT,
   server_id TEXT,
+  is_admin INTEGER NOT NULL DEFAULT 0,  -- 1=管理员（可备份/导入数据库）
   created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 
@@ -138,6 +161,9 @@ try {
 
 try {
   db.exec("ALTER TABLE player_profiles ADD COLUMN cultivation INTEGER DEFAULT 0");
+} catch (e) { /* 已存在 */ }
+try {
+  db.exec("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0");
 } catch (e) { /* 已存在 */ }
 
 module.exports = db;
