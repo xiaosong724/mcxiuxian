@@ -2,6 +2,10 @@
   <div class="container">
     <h1 class="page-title">⛩ 天南交易所</h1>
 
+    <div class="tip-banner pixel-panel">
+      ℹ️ 本站为游戏<b>[Minecraft]</b>辅助交易平台，新玩家请先在服务器内执行 <code>/ctm reg</code> 完成注册后登录。
+    </div>
+
     <div class="row card pixel-panel" style="justify-content: space-between;">
       <div class="row">
         <span class="muted">服务器：</span>

@@ -1,5 +1,9 @@
 <template>
   <div class="container" style="max-width:420px;margin-top:60px;">
+    <div class="tip-banner pixel-panel">
+      ⚠️ 本站为游戏<b>[Minecraft]</b>辅助交易平台，新玩家请先在服务器内执行
+      <code>/ctm reg</code> 完成注册后登录。
+    </div>
     <div class="card pixel-panel">
       <h1 class="page-title">修士登录</h1>
       <div class="row" style="margin-bottom:12px;">

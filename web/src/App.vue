@@ -55,6 +55,9 @@
     </nav>
 
     <div v-if="toast" class="toast-msg pixel-panel">{{ toast }}</div>
+
+    <!-- 页脚：版本号 -->
+    <footer class="app-footer">⛩ 天南交易所 v{{ pkg.version }}</footer>
   </div>
 </template>
 
@@ -62,6 +65,7 @@
 import { ref, onMounted, onUnmounted, provide } from 'vue'
 import { useUserStore } from './store'
 import { api } from './api'
+import pkg from '../package.json'
 
 const store = useUserStore()
 const toast = ref('')
