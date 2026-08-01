@@ -6,9 +6,9 @@
 # =============================================================================
 set -e
 
-echo "==> [1/6] 安装 Node.js 20.x ..."
-if ! command -v node >/dev/null 2>&1; then
-  curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+echo "==> [1/6] 安装 Node.js 22.x ..."
+if ! command -v node >/dev/null 2>&1 || [ "$(node -v | cut -d. -f1 | tr -d 'v')" -lt 22 ]; then
+  curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
   sudo apt-get install -y nodejs
 fi
 echo "    Node: $(node -v)"
