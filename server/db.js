@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS users (
   xuid TEXT,
   server_id TEXT,
   is_admin INTEGER NOT NULL DEFAULT 0,  -- 1=管理员（可备份/导入数据库）
+  readonly INTEGER NOT NULL DEFAULT 0,  -- 1=只读测试账号（禁止购买/任何写操作）
   created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 
@@ -164,6 +165,9 @@ try {
 } catch (e) { /* 已存在 */ }
 try {
   db.exec("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0");
+} catch (e) { /* 已存在 */ }
+try {
+  db.exec("ALTER TABLE users ADD COLUMN readonly INTEGER DEFAULT 0");
 } catch (e) { /* 已存在 */ }
 
 module.exports = db;

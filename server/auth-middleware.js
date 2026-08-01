@@ -44,7 +44,7 @@ function requireUser(req, res, next) {
   }
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    const user = db.prepare('SELECT id, username, xuid, server_id, is_admin FROM users WHERE id = ?').get(payload.uid);
+    const user = db.prepare('SELECT id, username, xuid, server_id, is_admin, readonly FROM users WHERE id = ?').get(payload.uid);
     if (!user) {
       return res.status(401).json({ code: 401, msg: '账号不存在' });
     }
@@ -67,8 +67,18 @@ function requireAdmin(req, res, next) {
   });
 }
 
+/**
+ * 可写校验：只读测试账号禁止任何写操作（加购/移除/下架/删除等）
+ */
+function requireWritable(req, res, next) {
+  if (req.user && req.user.readonly) {
+    return res.status(403).json({ code: 403, msg: '测试账号为只读权限，无法执行此操作' });
+  }
+  next();
+}
+
 function signToken(user) {
   return jwt.sign({ uid: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRE });
 }
 
-module.exports = { requireServerKey, requireUser, requireAdmin, signToken, JWT_SECRET };
+module.exports = { requireServerKey, requireUser, requireAdmin, requireWritable, signToken, JWT_SECRET };

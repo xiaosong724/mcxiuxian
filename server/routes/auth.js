@@ -57,7 +57,7 @@ router.post('/login', (req, res) => {
   if (hashPassword(password, salt) !== hash) {
     return res.status(401).json({ code: 401, msg: '密码错误' });
   }
-  res.json({ code: 0, msg: '登录成功', token: signToken(user), user: { id: user.id, username: user.username, xuid: user.xuid, server_id: user.server_id, is_admin: user.is_admin || 0 } });
+  res.json({ code: 0, msg: '登录成功', token: signToken(user), user: { id: user.id, username: user.username, xuid: user.xuid, server_id: user.server_id, is_admin: user.is_admin || 0, readonly: user.readonly || 0 } });
 });
 
 // ---------- 忘记密码：xuid + serverKey 改密 ----------

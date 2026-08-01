@@ -3,7 +3,7 @@
 // =============================================================================
 const express = require('express');
 const db = require('../db');
-const { requireServerKey, requireUser } = require('../auth-middleware');
+const { requireServerKey, requireUser, requireWritable } = require('../auth-middleware');
 
 const router = express.Router();
 const MAX_PRICE = 100000000; // 单价上限 1 亿
@@ -113,7 +113,7 @@ router.get('/:id', (req, res) => {
 });
 
 // ---------- 卖家下架（网页，需登录且是该商品卖家） ----------
-router.post('/:id/off', requireUser, (req, res) => {
+router.post('/:id/off', requireUser, requireWritable, (req, res) => {
   const row = db.prepare('SELECT * FROM items WHERE id = ?').get(Number(req.params.id));
   if (!row) return res.status(404).json({ code: 404, msg: '商品不存在' });
   if (row.seller_username !== req.user.username) {
@@ -186,7 +186,7 @@ router.get('/seller/:username', (req, res) => {
 });
 
 // ---------- 删除商品（网页，卖家删除已售罄商品） ----------
-router.post('/:id/delete', requireUser, (req, res) => {
+router.post('/:id/delete', requireUser, requireWritable, (req, res) => {
   const row = db.prepare('SELECT * FROM items WHERE id = ?').get(Number(req.params.id));
   if (!row) return res.status(404).json({ code: 404, msg: '商品不存在' });
   if (row.seller_username !== req.user.username) {

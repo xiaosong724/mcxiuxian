@@ -3,7 +3,7 @@
 // =============================================================================
 const express = require('express');
 const db = require('../db');
-const { requireUser } = require('../auth-middleware');
+const { requireUser, requireWritable } = require('../auth-middleware');
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.get('/', requireUser, (req, res) => {
 });
 
 // ---------- 加购 ----------
-router.post('/', requireUser, (req, res) => {
+router.post('/', requireUser, requireWritable, (req, res) => {
   const { itemId, quantity } = req.body;
   const qty = Math.floor(Number(quantity)) || 1;
   if (qty < 1 || qty > 64) return res.status(400).json({ code: 400, msg: '数量需为1-64' });
@@ -32,7 +32,7 @@ router.post('/', requireUser, (req, res) => {
 });
 
 // ---------- 移除购物车项 ----------
-router.delete('/:cartId', requireUser, (req, res) => {
+router.delete('/:cartId', requireUser, requireWritable, (req, res) => {
   const row = db.prepare('SELECT * FROM cart WHERE id = ? AND user_id = ?').get(Number(req.params.cartId), req.user.id);
   if (!row) return res.status(404).json({ code: 404, msg: '购物车项不存在' });
   db.prepare('DELETE FROM cart WHERE id = ?').run(row.id);
