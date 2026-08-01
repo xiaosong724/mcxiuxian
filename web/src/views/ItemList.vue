@@ -152,7 +152,9 @@ const serverOptions = computed(() => {
   if (store.isLogin && !myCrossOpen.value) return servers.value.filter(s => s.id === myServerId.value)
   return servers.value
 })
-const showAllOption = computed(() => !(store.isLogin && !myCrossOpen.value))
+// 「全部服务器」选项仅「已登录且本服跨服开启」时显示；
+// 未登录游客默认选中第一个服务器，不受跨服状态影响
+const showAllOption = computed(() => store.isLogin && myCrossOpen.value)
 
 // 服务器 id → 名称（找不到则显示 id 本身）
 function serverName(id) {
