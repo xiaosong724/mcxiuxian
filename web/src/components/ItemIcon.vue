@@ -1,6 +1,8 @@
 <template>
   <div class="item-icon" :class="'icon-' + kind">
-    <span v-if="shape === 'herb'" class="shape shape-herb"><i></i><i></i><i></i></span>
+    <span v-if="kind === 'alchemy' && danEmoji" class="dan-emoji">{{ danEmoji }}</span>
+    <span v-else-if="kind === 'herb'" class="dan-emoji">🌿</span>
+    <span v-else-if="shape === 'herb'" class="shape shape-herb"><i></i><i></i><i></i></span>
     <span v-else-if="shape === 'bag'" class="bag-box"><img src="/img/bag.webp" alt="储物袋" /></span>
     <span v-else-if="shape" class="shape" :class="'shape-' + shape"></span>
     <span v-else class="icon-badge">{{ firstChar }}</span>
@@ -10,9 +12,22 @@
 <script setup>
 import { computed } from 'vue'
 
-const props = defineProps({ itemType: { type: String, default: '' } })
+const props = defineProps({ itemType: { type: String, default: '' }, title: { type: String, default: '' } })
 
 const t = computed(() => props.itemType || '')
+
+// 丹药按名称匹配对应图标（与玩法介绍页一致）
+const danEmoji = computed(() => {
+  if (!t.value.includes('apple')) return ''
+  const title = props.title || ''
+  if (title.includes('回灵丹')) return '🟢'
+  if (title.includes('培元丹')) return '🟡'
+  if (title.includes('五行丹')) return '🟠'
+  if (title.includes('续命丹')) return '❤️'
+  if (title.includes('破障丹')) return '🔥'
+  if (title.includes('洗髓丹')) return '🌀'
+  return ''
+})
 
 const kind = computed(() => {
   const v = t.value

@@ -116,6 +116,7 @@ body {
 .icon-other .icon-badge { background: linear-gradient(135deg,#7a7a8a,#4a4a5a); }
 
 /* 丹药：圆形丹药丸（金） */
+.dan-emoji { font-size: 34px; line-height: 1; filter: drop-shadow(0 3px 0 rgba(0,0,0,.4)); }
 .shape-pill {
   width: 36px;
   height: 36px;

@@ -27,7 +27,7 @@
 
     <div class="items-grid">
       <div v-for="it in items" :key="it.id" class="item-card pixel-panel" @click="openDetail(it)">
-        <ItemIcon :item-type="it.itemType" />
+        <ItemIcon :item-type="it.itemType" :title="it.title" />
         <div class="title">
           <div class="item-name">{{ splitTitle(it.title).name }}</div>
           <div class="item-attrs" v-if="splitTitle(it.title).attrs">{{ splitTitle(it.title).attrs }}</div>
@@ -55,7 +55,7 @@
         <h3 class="detail-name">{{ splitTitle(detail.title).name }}</h3>
         <div v-if="splitTitle(detail.title).attrs" class="detail-attrs">{{ splitTitle(detail.title).attrs }}</div>
         <div class="row" style="gap:20px;margin-top:8px;">
-          <ItemIcon :item-type="detail.itemType" />
+          <ItemIcon :item-type="detail.itemType" :title="detail.title" />
           <div>
             <div>单价：<span class="gold-price">{{ detail.unitPrice }}</span> 灵石</div>
             <div>剩余：{{ detail.remaining }} 个</div>

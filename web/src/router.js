@@ -9,6 +9,7 @@ const routes = [
   { path: '/orders', name: 'orders', component: () => import('./views/Orders.vue') },
   { path: '/rank', name: 'rank', component: () => import('./views/Rank.vue') },
   { path: '/admin', name: 'admin', component: () => import('./views/Admin.vue') },
+  { path: '/help', name: 'help', component: () => import('./views/Help.vue') },
 ]
 
 const router = createRouter({

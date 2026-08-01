@@ -9,6 +9,7 @@
       <RouterLink to="/orders" active-class="active">交易记录</RouterLink>
       <RouterLink to="/rank" active-class="active">排行榜</RouterLink>
       <RouterLink v-if="store.isAdmin" to="/admin" active-class="active">管理</RouterLink>
+      <RouterLink to="/help" active-class="active">玩法介绍</RouterLink>
       <span class="spacer"></span>
       <template v-if="store.isLogin">
         <span class="muted">修士：{{ store.username }}</span>
@@ -45,6 +46,9 @@
       </RouterLink>
       <RouterLink to="/rank" active-class="active" class="tab-item">
         <span class="tab-label">排行</span>
+      </RouterLink>
+      <RouterLink to="/help" active-class="active" class="tab-item">
+        <span class="tab-label">玩法</span>
       </RouterLink>
       <RouterLink v-if="!store.isLogin" to="/login" class="tab-item" active-class="active">
         <span class="tab-label">登录</span>
