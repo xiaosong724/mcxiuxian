@@ -1,0 +1,27 @@
+/xiuxian	打开修仙主菜单（表单）
+/xx status	查看自身修炼状态
+/xx sell	出售妖丹
+/xx absorb <数量>	吸收灵石
+/xx restore <数量>	恢复灵气
+/xx breakthrough	尝试突破境界
+/cun	将手中物品存入储物袋
+/qh	强化手中储物袋（成功50%，消耗1个1-3级储物袋）
+管理员指令（OP）
+
+指令	用途
+/xgive <类型> <玩家名> <数量>	修仙给予：ls=灵石、xw=修为、sxj/sxm/sxs/sxh/sxt=金/木/水/火/土属性
+/ctmgive	给自己所有丹药 + 药材（测试用）
+交易系统（/ctm）
+
+指令	用途
+/ctm menu	打开天南交易所菜单（表单）
+/ctm reg <账号> <密码>	注册账号（注册即绑定当前玩家 xuid + 本服）
+/ctm changepw <新密码>	修改密码
+/ctm sell [价格]	上架手持物品（不填价格打开表单）
+/ctm cart	查看购物车清单
+/ctm buy <编号>	支付购物车第 N 项（背包满会拦截）
+/ctm income	卖出记录（最新 10 条，更多去网页看）
+/ctm claim	领取卖出所得的灵石
+/ctm back [编号]	取回已下架商品（不填编号显示列表）
+/ctm cross	查询跨服交易状态
+/ctm cross on | off	开启/关闭跨服交易（仅 OP）

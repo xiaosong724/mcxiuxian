@@ -1,0 +1,533 @@
+/* =============================================================================
+   天南交易所 - MC 像素风样式
+   ============================================================================= */
+/* 像素字体：方舟像素字体（本地加载） */
+@font-face {
+  font-family: 'ArkPixel';
+  src: url('/fonts/ark-pixel-12px-proportional-latin.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ArkPixel';
+  src: url('/fonts/ark-pixel-12px-proportional-zh_cn.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+4E00-9FFF, U+3000-303F, U+FF00-FFEF; /* 中文区 */
+}
+
+:root {
+  --bg-dark: #1a1c22;
+  --bg-panel: #2b2d3a;
+  --bg-panel2: #3a3d4f;
+  --border: #4a4d63;
+  --accent: #7cc9a0;
+  --accent2: #c9a47c;
+  --text: #e8e8f0;
+  --text-dim: #9aa0b0;
+  --danger: #c97c7c;
+  --gold: #d4a93c;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'ArkPixel', 'Courier New', 'Microsoft YaHei', monospace;
+  image-rendering: pixelated;
+  min-height: 100vh;
+}
+
+/* MC 风格像素边框 */
+.pixel-panel {
+  background: var(--bg-panel);
+  border: 3px solid var(--border);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.06), inset 0 -2px 0 rgba(0,0,0,.4);
+  image-rendering: pixelated;
+}
+.pixel-btn {
+  display: inline-block;
+  padding: 8px 18px;
+  background: var(--bg-panel2);
+  border: 2px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.1);
+  transition: filter .1s;
+  text-decoration: none;
+}
+.pixel-btn:hover { filter: brightness(1.2); }
+.pixel-btn:active { box-shadow: inset 0 -2px 0 rgba(0,0,0,.4); }
+.pixel-btn.green { background: #3f7a5c; border-color: #55a077; }
+.pixel-btn.gold { background: #7a633f; border-color: #a08a55; }
+.pixel-btn.red { background: #7a3f3f; border-color: #a05555; }
+.pixel-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.pixel-input {
+  padding: 8px 12px;
+  background: var(--bg-dark);
+  border: 2px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+}
+.pixel-input:focus { border-color: var(--accent); }
+
+/* ================= 商品图标（CSS 绘制：丹药圆/妖丹紫圆/药材叶/储物袋） ================= */
+.item-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #000;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.15), 0 3px 0 rgba(0,0,0,.5);
+  position: relative;
+  background: rgba(10,10,18,.55);
+}
+.item-icon::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255,255,255,.18);
+  pointer-events: none;
+}
+/* 无形状分类（矿石/其它）：文字徽章 */
+.icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 22px;
+  color: #fff;
+  text-shadow: 2px 2px 0 rgba(0,0,0,.5);
+  border: 2px solid #000;
+}
+.icon-ore .icon-badge { background: linear-gradient(135deg,#7c9ac9,#3f5a7a); }
+.icon-other .icon-badge { background: linear-gradient(135deg,#7a7a8a,#4a4a5a); }
+
+/* 丹药：圆形丹药丸（金） */
+.shape-pill {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #f0b429 48%, #a86e0e 100%);
+  border: 2px solid #6b4a08;
+  box-shadow: 0 3px 0 rgba(0,0,0,.45), inset 0 -3px 0 rgba(0,0,0,.25);
+  position: relative;
+}
+.shape-pill::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  width: 10px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.75);
+  transform: rotate(-20deg);
+}
+
+/* 妖丹：紫色圆形 */
+.shape-core {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e6b3ff, #9b30ff 52%, #4a0a8a 100%);
+  border: 2px solid #2a0050;
+  box-shadow: 0 0 10px rgba(155,48,255,.75), 0 3px 0 rgba(0,0,0,.45);
+  position: relative;
+}
+.shape-core::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 9px;
+  width: 9px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.6);
+  transform: rotate(-20deg);
+}
+
+/* 药材：单株灵草（茎 + 两侧尖叶 + 顶部花穗光点） */
+.shape-herb {
+  width: 30px;
+  height: 34px;
+  position: relative;
+}
+/* 茎 */
+.shape-herb::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 5px;
+  bottom: 2px;
+  width: 2px;
+  margin-left: -1px;
+  background: linear-gradient(180deg, #4a9f3a, #2a7a2a);
+  border-radius: 2px;
+}
+/* 叶片：尖叶从茎下部向两侧伸出 */
+.shape-herb i {
+  position: absolute;
+  width: 13px;
+  height: 9px;
+  background: linear-gradient(135deg, #8be06f, #2f8f2f);
+  border: 2px solid #1a5a1a;
+  border-radius: 0 100% 0 100%;
+}
+.shape-herb i:nth-child(1) {   /* 左叶 */
+  left: 32%;
+  top: 15px;
+  transform: rotate(-40deg);
+}
+.shape-herb i:nth-child(2) {   /* 右叶 */
+  right: 32%;
+  top: 15px;
+  transform: rotate(140deg);
+}
+.shape-herb i:nth-child(3) {   /* 顶叶（尖端朝上） */
+  left: 50%;
+  top: 9px;
+  width: 11px;
+  height: 8px;
+  transform: translateX(-50%) rotate(-90deg);
+}
+/* 顶部花穗/灵气光点 */
+.shape-herb::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fff7b0, #f5d63a);
+  border: 1.5px solid #c9a81a;
+  box-shadow: 0 0 6px rgba(245,214,58,.8);
+}
+
+/* 储物袋：自定义图片图标（/img/bag.webp） */
+.bag-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.bag-box img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 0 rgba(0,0,0,.4));
+}
+/* 储物袋：仙侠锦袋（上窄下宽水滴形袋身 + 中上部绳子捆扎 + 系绳） */
+.shape-bag {
+  width: 32px;
+  height: 40px;
+  position: relative;
+}
+/* 袋身：上窄下宽，底部圆润宽大 */
+.shape-bag::after {
+  content: '';
+  position: absolute;
+  left: 1px;
+  bottom: 0;
+  width: 30px;
+  height: 32px;
+  background: linear-gradient(180deg, #eeb0ff 0%, #c67aee 55%, #7a3ac0 100%);
+  border: 2px solid #4a2a7a;
+  border-radius: 45% 45% 50% 50% / 22% 22% 55% 55%;
+  box-shadow: inset 0 4px 0 rgba(255,255,255,.4), inset 0 -3px 0 rgba(0,0,0,.25), 0 3px 0 rgba(0,0,0,.4);
+}
+/* 捆扎绳：中上部勒紧一圈（比袋身窄，勒出凹陷感） */
+.shape-bag::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 12px;
+  height: 5px;
+  background: repeating-linear-gradient(90deg, #f0c84e 0 3px, #c89a2a 3px 6px);
+  border: 1px solid #8a6a1a;
+  border-radius: 3px;
+  z-index: 2;
+  box-shadow: 0 -1px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.3);
+}
+/* 系绳：从捆扎处向上伸出 */
+.shape-bag i {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 3px;
+  height: 12px;
+  margin-left: -1.5px;
+  background: #e0b43a;
+  border-radius: 2px;
+  z-index: 3;
+}
+/* 绳头打结圈 */
+.shape-bag i::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 7px;
+  height: 5px;
+  margin-left: -3.5px;
+  margin-bottom: 1px;
+  border: 2px solid #e0b43a;
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* 顶部导航 */
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background: var(--bg-panel);
+  border-bottom: 3px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.navbar .logo { font-size: 20px; font-weight: bold; color: var(--gold); }
+.navbar .spacer { flex: 1; }
+.navbar a { color: var(--text); text-decoration: none; padding: 6px 10px; }
+.navbar a:hover, .navbar a.active { color: var(--gold); }
+
+/* 商品网格 */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+.item-card {
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: transform .1s;
+}
+.item-card:hover { transform: translateY(-2px); }
+.item-card .title { font-weight: bold; text-align: center; min-height: 36px; }
+.item-card .price { color: var(--gold); }
+.item-card .remaining { color: var(--text-dim); font-size: 12px; }
+
+/* 布局容器 */
+.container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.card { padding: 20px; margin-bottom: 16px; }
+
+h1.page-title { color: var(--gold); margin-bottom: 16px; font-size: 24px; }
+.muted { color: var(--text-dim); font-size: 13px; }
+
+table.list { width: 100%; border-collapse: collapse; }
+table.list th, table.list td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+table.list th { color: var(--gold); }
+
+/* 分页控件 */
+.pagination {  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 0 4px;
+}
+.page-btn {
+  padding: 6px 16px;
+  border: 2px solid var(--border);
+  background: var(--bg-panel2);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.page-btn:disabled { opacity: .4; cursor: not-allowed; }
+.page-info { color: var(--text-dim); font-size: 13px; }
+
+/* 灵石显示 */
+.coin { color: var(--gold); font-weight: bold; font-size: 14px; white-space: nowrap; }
+.mobile-coin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: var(--bg-panel);
+  border-bottom: 2px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: flex; align-items: center; justify-content: center; z-index: 200;
+}
+.modal { min-width: 320px; padding: 20px; }
+.modal h3 { color: var(--gold); margin-bottom: 12px; }
+.modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+/* 消息提示 */
+.toast-msg {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--bg-panel2); border: 2px solid var(--border);
+  padding: 10px 20px; z-index: 300; max-width: 80%;
+}
+
+/* =============================================================================
+   移动端适配（手机友好）
+   ============================================================================= */
+/* 手机端显示底部导航，隐藏桌面顶部导航 */
+.mobile-nav { display: none; }
+@media (max-width: 768px) {
+  .desktop-nav { display: none; }
+  .mobile-nav { display: flex; }
+
+  body { font-size: 14px; }
+
+  /* 商品网格：手机双列 */
+  .items-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+  .item-card { padding: 12px; }
+  .item-icon { width: 52px; height: 52px; font-size: 22px; }
+  .item-card .title { font-size: 13px; min-height: 30px; }
+
+  /* 底部固定导航：5个等宽 Tab，不换行 */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; top: auto;
+    left: 0; right: 0;
+    background: var(--bg-panel);
+    border-top: 3px solid var(--border);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: space-around;
+    z-index: 150;
+    padding: 0;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+  .bottom-nav .tab-item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 2px;
+    color: var(--text-dim);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  /* MC 风格像素字体 */
+  .bottom-nav .tab-item .tab-label {
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 1px;
+    color: #f0f0f0;
+    font-family: 'ArkPixel', 'Courier New', 'Microsoft YaHei', monospace;
+  }
+  .bottom-nav .tab-item.active .tab-label {
+    color: var(--gold);
+  }
+  .bottom-nav .tab-item.active {
+    background: rgba(212,169,60,.08);
+  }
+  .bottom-nav .tab-item:active { background: rgba(255,255,255,.06); }
+
+  /* 内容底部留出导航高度 */
+  .container { padding: 12px 12px 72px; }
+  .page-title { font-size: 20px; }
+
+  /* 卡片内边距收窄 */
+  .card { padding: 14px; }
+
+  /* 弹窗：手机近全屏 */
+  .modal-mask { align-items: flex-end; }
+  .modal {
+    width: 100%;
+    min-width: 0;
+    border-radius: 12px 12px 0 0;
+    padding: 18px;
+  }
+
+  /* 表格：手机端卡片化（无需左右滑动，每条记录一张卡片） */
+  .table-wrap { overflow: visible; }
+  table.list { min-width: 0; }
+  table.list thead { display: none; }
+  table.list tr {
+    display: block;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: var(--bg-panel2);
+  }
+  table.list td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 2px;
+    border-bottom: 1px dashed rgba(255,255,255,.08);
+    text-align: left;
+  }
+  table.list td:last-child { border-bottom: none; }
+  table.list td::before {
+    content: attr(data-label);
+    color: var(--text-dim);
+    font-size: 12px;
+    flex-shrink: 0;
+    padding-right: 8px;
+  }
+  /* 操作列内容靠右 */
+  table.list td[data-label="操作"] { justify-content: flex-end; }
+
+  /* 交易记录：手机端两列卡片（只影响 orders-table） */
+  .orders-table tbody {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .orders-table tr { margin-bottom: 0; }
+  .orders-table td::before { font-size: 11px; }
+  .orders-table td { gap: 6px; padding: 5px 2px; }
+  .orders-table td:first-child { font-size: 12px; line-height: 1.3; }
+
+  /* 按钮更大，方便点击 */
+  .pixel-btn { padding: 10px 16px; font-size: 15px; }
+  .pixel-input { font-size: 16px; padding: 10px 12px; }  /* 防 iOS 缩放 */
+
+  /* 筛选栏换行 */
+  .row { gap: 8px; }
+  .pixel-input[style*="width:auto"] { width: 100% !important; }
+}
+
+@media (max-width: 400px) {
+  /* 超小屏保持双列（用户要求手机端两列），仅收窄间距 */
+  .items-grid { gap: 8px; }
+  .item-card { padding: 10px; }
+  .item-icon { width: 44px; height: 44px; }
+}

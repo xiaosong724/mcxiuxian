@@ -1,0 +1,14 @@
+{
+  "name": "xiuxian-ctm-server",
+  "version": "0.1.0",
+  "description": "修仙交易系统 - 后端 API 服务",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
