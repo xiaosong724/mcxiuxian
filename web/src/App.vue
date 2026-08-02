@@ -67,11 +67,13 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, provide } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from './store'
 import { api } from './api'
 import pkg from '../package.json'
 
 const store = useUserStore()
+const router = useRouter()
 const toast = ref('')
 function showToast(msg) { toast.value = msg; setTimeout(() => (toast.value = ''), 2500) }
 provide('toast', showToast)
@@ -84,10 +86,28 @@ async function refreshCoin() {
   if (r.code === 0 && r.profile) store.spiritStone = r.profile.spiritStone || 0
 }
 
+// 访问埋点：浏览器访客标识（localStorage 持久化），登录时带游戏名
+function getVisitorId() {
+  let vid = localStorage.getItem('ctm_visitor')
+  if (!vid) {
+    vid = 'v_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10)
+    localStorage.setItem('ctm_visitor', vid)
+  }
+  return vid
+}
+function reportVisit(path) {
+  try {
+    api.reportVisit(getVisitorId(), path || location.pathname, store.isLogin ? store.username : '')
+  } catch (e) { /* 埋点失败忽略 */ }
+}
+
 onMounted(() => {
   refreshCoin()
   coinTimer = setInterval(refreshCoin, 60000)
+  reportVisit(location.pathname)
 })
+// 路由切换也上报（SPA 内页面跳转计入访问）
+router.afterEach((to) => reportVisit(to.path))
 onUnmounted(() => { if (coinTimer) clearInterval(coinTimer) })
 
 function logout() {

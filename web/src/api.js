@@ -29,6 +29,10 @@ export const api = {
     return { code: 0, blob, filename: (res.headers.get('content-disposition') || '').match(/filename=(.+)/)?.[1] || 'backup.db' }
   },
   adminRestore: (fileBase64) => request('/admin/restore', { method: 'POST', body: JSON.stringify({ file: fileBase64 }) }),
+  // 管理员：访问统计（分页+搜索）
+  adminStats: (page = 1, pageSize = 20, name = '', region = '') => request(`/admin/stats?page=${page}&pageSize=${pageSize}&name=${encodeURIComponent(name)}&region=${encodeURIComponent(region)}`),
+  // 访问埋点（公开，页面加载时上报）
+  reportVisit: (visitorId, path, username) => request('/admin/visit', { method: 'POST', body: JSON.stringify({ visitorId, path, username }) }),
   // 认证
   login: (username, password) => request('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
   // 商品

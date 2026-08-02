@@ -54,6 +54,17 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 
+-- 网站访问记录（管理后台统计）
+CREATE TABLE IF NOT EXISTS visit_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ip TEXT,
+  ua TEXT,
+  path TEXT,
+  visitor_id TEXT,              -- 浏览器访客标识（游客 uuid；登录后更新为账号）
+  username TEXT,                -- 登录玩家游戏名（登录后回填，游客为 NULL）
+  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+
 -- 商品（单商品库存池：total_count 上架总量 / remaining 剩余可购）
 CREATE TABLE IF NOT EXISTS items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -168,6 +179,12 @@ try {
 } catch (e) { /* 已存在 */ }
 try {
   db.exec("ALTER TABLE users ADD COLUMN readonly INTEGER DEFAULT 0");
+} catch (e) { /* 已存在 */ }
+try {
+  db.exec("ALTER TABLE visit_logs ADD COLUMN visitor_id TEXT");
+} catch (e) { /* 已存在 */ }
+try {
+  db.exec("ALTER TABLE visit_logs ADD COLUMN username TEXT");
 } catch (e) { /* 已存在 */ }
 
 module.exports = db;

@@ -7,8 +7,96 @@
 const express = require('express');
 const db = require('../db');
 const { requireAdmin } = require('../auth-middleware');
+const geoip = require('geoip-lite');
 
 const router = express.Router();
+
+// 中国省级 ISO 码 → 中文名
+const REGION_CN = {
+  BJ: '北京', TJ: '天津', HE: '河北', SX: '山西', NM: '内蒙古', LN: '辽宁', JL: '吉林', HL: '黑龙江',
+  SH: '上海', JS: '江苏', ZJ: '浙江', AH: '安徽', FJ: '福建', JX: '江西', SD: '山东', HA: '河南',
+  HB: '湖北', HN: '湖南', GD: '广东', GX: '广西', HI: '海南', CQ: '重庆', SC: '四川', GZ: '贵州',
+  YN: '云南', XZ: '西藏', SN: '陕西', GS: '甘肃', QH: '青海', NX: '宁夏', XJ: '新疆', TW: '台湾',
+  HK: '香港', MO: '澳门'
+};
+
+// IP → 地域中文（离线 geoip-lite）
+function regionOf(ip) {
+  try {
+    const g = geoip.lookup(String(ip || '').replace(/^::ffff:/, ''));
+    if (!g) return '未知';
+    if (g.country === 'CN') return '中国' + (REGION_CN[g.region] ? '·' + REGION_CN[g.region] : '');
+    const map = { CN: '中国', US: '美国', JP: '日本', KR: '韩国', HK: '中国香港', TW: '中国台湾', SG: '新加坡', DE: '德国', GB: '英国', FR: '法国', RU: '俄罗斯', AU: '澳大利亚', CA: '加拿大' };
+    return map[g.country] || g.country;
+  } catch { return '未知'; }
+}
+
+// ---------- 访问埋点（前端页面加载上报，公开） ----------
+// body: { visitorId, path, username? }  登录时带 username，历史游客记录回填
+router.post('/visit', (req, res) => {
+  try {
+    const { visitorId, path: p, username } = req.body || {};
+    if (!visitorId) return res.json({ code: 0 });
+    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '';
+    // 登录用户：把该访客标识的历史记录回填游戏名（游客 → 玩家）
+    if (username) {
+      db.prepare("UPDATE visit_logs SET username=? WHERE visitor_id=? AND (username IS NULL OR username='')")
+        .run(username, String(visitorId));
+    }
+    db.prepare('INSERT INTO visit_logs (ip, ua, path, visitor_id, username) VALUES (?,?,?,?,?)')
+      .run(ip, String(req.headers['user-agent'] || '').slice(0, 200), String(p || '/').slice(0, 100), String(visitorId).slice(0, 64), username || null);
+    res.json({ code: 0 });
+  } catch (e) {
+    res.status(500).json({ code: 500, msg: '记录失败' });
+  }
+});
+
+// ---------- 访问统计（PV/UV/今日/最近访问，分页+搜索） ----------
+// ?page=&pageSize=&name=&region=
+//   name：登录游戏名 或 游客编号（如 游客1）；region：地域文字（如 广东）
+router.get('/stats', requireAdmin, (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const pageSize = Math.min(100, Math.max(1, parseInt(req.query.pageSize) || 20));
+    const offset = (page - 1) * pageSize;
+
+    const totalPV = db.prepare('SELECT COUNT(*) c FROM visit_logs').get().c;
+    const totalUV = db.prepare('SELECT COUNT(DISTINCT ip) c FROM visit_logs').get().c;
+    const today = db.prepare("SELECT COUNT(*) c FROM visit_logs WHERE date(created_at)=date('now','localtime')").get().c;
+    const todayUV = db.prepare("SELECT COUNT(DISTINCT ip) c FROM visit_logs WHERE date(created_at)=date('now','localtime')").get().c;
+
+    // 取全部记录（JS 处理身份/地域/过滤；数据量大后可改 SQL+缓存优化）
+    const rows = db.prepare('SELECT id, ip, visitor_id, username, path, created_at FROM visit_logs ORDER BY id DESC').all();
+
+    // 游客编号：无 username 的 visitor_id 按最早出现顺序编号
+    const guestOrder = [];
+    for (const r of rows) {
+      if (!r.username && r.visitor_id && guestOrder.indexOf(r.visitor_id) === -1) guestOrder.push(r.visitor_id);
+    }
+    const guestNo = {};
+    guestOrder.forEach((v, i) => { guestNo[v] = i + 1; });
+
+    // 身份 + 地域
+    const list = rows.map(r => {
+      const identity = r.username || (r.visitor_id && guestNo[r.visitor_id] ? '游客' + guestNo[r.visitor_id] : '游客·' + (r.ip || ''));
+      return { id: r.id, identity, username: r.username || '', ip: r.ip, region: regionOf(r.ip), path: r.path || '/', time: r.created_at };
+    });
+
+    // 过滤
+    const name = (req.query.name || '').trim();
+    const region = (req.query.region || '').trim();
+    const filtered = list.filter(v => {
+      if (name && !v.identity.includes(name) && !(v.username || '').includes(name)) return false;
+      if (region && !v.region.includes(region)) return false;
+      return true;
+    });
+
+    const recent = filtered.slice(offset, offset + pageSize);
+    res.json({ code: 0, stats: { totalPV, totalUV, todayPV: today, todayUV }, list: recent, total: filtered.length, page, pageSize });
+  } catch (e) {
+    res.status(500).json({ code: 500, msg: '统计失败：' + e.message });
+  }
+});
 
 // 读取全部业务表名（排除 sqlite 内部表）
 function getTables() {

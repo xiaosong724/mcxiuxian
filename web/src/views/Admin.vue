@@ -18,15 +18,81 @@
       </div>
       <p v-if="busy" class="muted" style="margin-top:10px;">处理中，请稍候...</p>
     </div>
+
+    <div class="card pixel-panel">
+      <h3 style="color:var(--gold);margin-bottom:12px;">📊 网站访问统计</h3>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num">{{ stats.totalPV }}</div><div class="stat-label">总访问量（PV）</div></div>
+        <div class="stat-card"><div class="stat-num">{{ stats.totalUV }}</div><div class="stat-label">总访客（IP）</div></div>
+        <div class="stat-card"><div class="stat-num">{{ stats.todayPV }}</div><div class="stat-label">今日访问</div></div>
+        <div class="stat-card"><div class="stat-num">{{ stats.todayUV }}</div><div class="stat-label">今日访客</div></div>
+      </div>
+      <div class="row" style="margin:14px 0 10px;gap:8px;">
+        <input v-model="searchName" class="pixel-input" placeholder="按名字搜索（玩家名/游客1）" style="flex:1;min-width:140px;" @keyup.enter="search" />
+        <input v-model="searchRegion" class="pixel-input" placeholder="按地域搜索（如 广东）" style="flex:1;min-width:120px;" @keyup.enter="search" />
+        <button class="pixel-btn" @click="search">搜索</button>
+      </div>
+      <div class="table-wrap">
+        <table class="list">
+          <thead><tr><th>访客</th><th>IP</th><th>地域</th><th>页面</th><th>时间</th></tr></thead>
+          <tbody>
+            <tr v-for="v in list" :key="v.id">
+              <td data-label="访客">
+                <span :class="v.username ? 'logined' : 'guest'">{{ v.identity }}</span>
+              </td>
+              <td data-label="IP">{{ v.ip }}</td>
+              <td data-label="地域">{{ v.region }}</td>
+              <td data-label="页面">{{ v.path }}</td>
+              <td data-label="时间" class="muted">{{ v.time }}</td>
+            </tr>
+            <tr v-if="list.length === 0"><td colspan="5" class="muted" style="text-align:center;">暂无访问记录</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="page-btn" :disabled="page <= 1" @click="changePage(page - 1)">‹ 上一页</button>
+        <span class="page-info">第 {{ page }} / {{ totalPages }} 页 · 共 {{ total }} 条</span>
+        <button class="page-btn" :disabled="page >= totalPages" @click="changePage(page + 1)">下一页 ›</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, inject } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { api } from '../api'
 
 const toast = inject('toast')
 const busy = ref(false)
+const stats = ref({ totalPV: 0, totalUV: 0, todayPV: 0, todayUV: 0 })
+const list = ref([])
+const total = ref(0)
+const page = ref(1)
+const pageSize = 20
+const searchName = ref('')
+const searchRegion = ref('')
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pageSize)))
+
+async function loadStats() {
+  const r = await api.adminStats(page.value, pageSize, searchName.value, searchRegion.value)
+  if (r.code === 0) {
+    stats.value = r.stats
+    list.value = r.list || []
+    total.value = r.total || 0
+  }
+}
+
+function search() {
+  page.value = 1
+  loadStats()
+}
+
+function changePage(p) {
+  page.value = p
+  loadStats()
+}
+
+onMounted(loadStats)
 
 async function backup() {
   if (busy.value) return
@@ -74,4 +140,10 @@ function onFile(e) {
 
 <style scoped>
 .pixel-btn.disabled { opacity: .5; pointer-events: none; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.stat-card { padding: 12px; text-align: center; background: var(--bg-panel2); border: 2px solid var(--border); border-radius: 6px; }
+.stat-num { font-size: 26px; font-weight: bold; color: var(--gold); }
+.stat-label { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.logined { color: var(--accent); font-weight: bold; }
+.guest { color: var(--text-dim); }
 </style>
